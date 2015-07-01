@@ -12,7 +12,7 @@
 namespace FOS\UserBundle\Controller;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\Security;
 
 class SecurityController extends ContainerAware
 {
@@ -24,11 +24,11 @@ class SecurityController extends ContainerAware
         /* @var $session \Symfony\Component\HttpFoundation\Session\Session */
 
         // get the error if any (works with forward and redirect -- see below)
-        if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
-            $error = $request->attributes->get(SecurityContext::AUTHENTICATION_ERROR);
-        } elseif (null !== $session && $session->has(SecurityContext::AUTHENTICATION_ERROR)) {
-            $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
-            $session->remove(SecurityContext::AUTHENTICATION_ERROR);
+        if ($request->attributes->has(Security::AUTHENTICATION_ERROR)) {
+            $error = $request->attributes->get(Security::AUTHENTICATION_ERROR);
+        } elseif (null !== $session && $session->has(Security::AUTHENTICATION_ERROR)) {
+            $error = $session->get(Security::AUTHENTICATION_ERROR);
+            $session->remove(Security::AUTHENTICATION_ERROR);
         } else {
             $error = '';
         }
@@ -38,9 +38,10 @@ class SecurityController extends ContainerAware
             $error = $error->getMessage();
         }
         // last username entered by the user
-        $lastUsername = (null === $session) ? '' : $session->get(SecurityContext::LAST_USERNAME);
+        $lastUsername = (null === $session) ? '' : $session->get(Security::LAST_USERNAME);
 
-        $csrfToken = $this->container->get('form.csrf_provider')->generateCsrfToken('authenticate');
+      //$csrfToken = $this->container->get('form.csrf_provider')->generateCsrfToken('authenticate');
+      $csrfToken = $this->container->get('security.csrf.token_manager')->generateCsrfToken('authenticate');
 
         return $this->renderLogin(array(
             'last_username' => $lastUsername,
